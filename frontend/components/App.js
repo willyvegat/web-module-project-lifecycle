@@ -5,8 +5,16 @@ const URL = 'http://localhost:9000/api/todos'
 
 export default class App extends React.Component {
   state = {
-    todos: []
+    todos: [],
+    error: '',
+    todoNameInput: ''
   }
+
+  handleInputChange = event => {
+    const { value } = event.target;
+    this.setState({ ...this.state, todoNameInput: value })
+  }
+
   fetchAllTodos = () => {
     axios.get(URL)
       .then(res => {
@@ -14,21 +22,29 @@ export default class App extends React.Component {
         this.setState({ ...this.state, todos: res.data.data })
       })
       .catch(err => {
-        debugger
+        this.setState({ ...this.state, error: err.response.data.message })
       })
   }
+
   componentDidMount() {
     this.fetchAllTodos()
   }
   render() {
     return (
       <div>
-        <h2>Todos:</h2>
-        {
-          this.state.todos.map(todo => {
-            return <div key={todo.id}>{todo.name}</div>
-          })
-        }
+        <div id="error">Error: {this.state.error}</div>
+        <div id='todos'>
+          <h2>Todos:</h2>
+          {
+            this.state.todos.map(todo => {
+              return <div key={todo.id}>{todo.name}</div>
+            })
+          }
+        </div>
+        <form id="todoForm">
+          <input value={this.state.todoNameInput} onChange={this.handleInputChange} type="text" placeholder='"Type todo'></input>
+          <input type="submit"></input>
+        </form>
       </div>
     )
   }
