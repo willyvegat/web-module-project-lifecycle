@@ -33,13 +33,25 @@ export default class App extends React.Component {
     this.postNewTodo()
   }
 
-  fetchAllTodos = () => {
+  fetchAllTodos = () => {``
     axios.get(URL)
       .then(res => {
         // console.log(res.data.data)
         this.setState({ ...this.state, todos: res.data.data })
       })
       .catch(this.setAxiosResponseError)
+  }
+
+  toggleCompleted = id => () => {
+    axios.patch(`${URL}/${id}`)
+      .then(res => {
+        this.setState({ ...this.state, todos: this.state.todos.map(todo => {
+          if (todo.id !== id) return todo
+          return res.data.data;
+          })
+        })
+      })
+      .catch(this.setAxiosResponseError);
   }
 
   componentDidMount() {
@@ -54,7 +66,7 @@ export default class App extends React.Component {
           <h2>Todos:</h2>
           {
             this.state.todos.map(todo => {
-              return <div key={todo.id}>{todo.name}</div>
+              return <div onClick={this.toggleCompleted(todo.id)} key={todo.id}>{todo.name} {todo.completed ? ' ✔️' : ""}</div>
             })
           }
         </div>
